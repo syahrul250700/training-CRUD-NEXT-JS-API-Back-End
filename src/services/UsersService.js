@@ -5,6 +5,18 @@ import { ErrorResponse } from "../app/error.js";
 import { loginUserValidation } from "../validations/UsersValidation.js";
 import { validate } from "../app/validate.js";
 
+const createAccessToken = (user) => {
+  return jwt.sign(user, process.env.SECRET_KEY, {
+    expiresIn: "1m",
+  });
+};
+
+const createRefreshToken = (user_name) => {
+  return jwt.sign({ username: user_name }, process.env.SECRET_KEY, {
+    expiresIn: "10m",
+  });
+};
+
 const login = async (req) => {
   const input = validate(loginUserValidation, req); //validasi input
   try {
@@ -22,15 +34,46 @@ const login = async (req) => {
         // jika password salah
         throw new ErrorResponse(401, "Password salah");
       } else {
-        const token = jwt.sign(users[0], process.env.SECRET_KEY, {
-          expiresIn: "1m",
-        });
+        const accessToken = createAccessToken(users[0]);
+        const refreshToken = createRefreshToken(users[0].user_name);
 
-        return token;
+        return { accessToken, refreshToken };
       }
     } else {
       throw new ErrorResponse(401, "User Tidak ditemukan");
     }
+  } catch (error) {
+    throw new ErrorResponse(error.status, error);
+  }
+};
+
+const verify_token = async (accessToken) => {
+  try {
+    const user = await jwt.verify(
+      accessToken,
+      process.env.SECRET_KEY,
+      (err, decoded) => {
+        if (err) {
+          let message = "";
+          if (err.name == "JsonWebTokenError") {
+            message = "Sesi tidak valid";
+          } else if (err.name == "TokenExpiredError") {
+            message = "Sesi Anda Berakhir, Silahkan Login Kembali";
+          }
+          throw new ErrorResponse(401, message);
+        } else {
+          return decoded;
+        }
+      }
+    );
+    return user;
+  } catch (error) {
+    throw new ErrorResponse(error.status, error);
+  }
+};
+
+const refresh_token = async (refreshToken) => {
+  try {
   } catch (error) {
     throw new ErrorResponse(error.status, error);
   }
@@ -51,5 +94,7 @@ const list = async () => {
 
 export default {
   login,
+  verify_token,
+  refresh_token,
   list,
 };
