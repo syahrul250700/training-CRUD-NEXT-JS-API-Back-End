@@ -8,7 +8,7 @@ app.route("/").get((req, res) => {
   res.status(200).json({
     status: true,
     code: res.statusCode,
-    message: `Welcome to the API ${port}`,
+    message: `Server API mode ${process.env.MODE} is running on ${process.env.HOST}:${process.env.PORT}`,
   });
 });
 

@@ -8,7 +8,7 @@ export const loginUsers = async (req, res, next) => {
     res.cookie("access_token", access_token, { httpOnly: true });
     res.cookie("refresh_token", refresh_token, {
       httpOnly: true,
-      maxAge: 120000,
+      maxAge: 86400000, //24jam
     });
     res.cookie("expires_at", expires_at, { httpOnly: true });
     res.status(200).json({
