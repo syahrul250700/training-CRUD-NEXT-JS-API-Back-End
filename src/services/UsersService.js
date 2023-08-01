@@ -16,7 +16,7 @@ const createAccessToken = (user) => {
 
 const createRefreshToken = (user_name) => {
   return jwt.sign({ username: user_name }, process.env.SECRET_KEY, {
-    expiresIn: "10m",
+    expiresIn: "24h", //24jam dari waktu refresh token
   });
 };
 
