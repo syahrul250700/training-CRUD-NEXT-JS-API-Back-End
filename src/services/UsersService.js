@@ -2,7 +2,10 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import * as db from "../app/db.js";
 import { ErrorResponse } from "../app/error.js";
-import { addUserValidation, loginUserValidation } from "../validations/UsersValidation.js";
+import {
+  addUserValidation,
+  loginUserValidation,
+} from "../validations/UsersValidation.js";
 import { validate } from "../app/validate.js";
 
 const createAccessToken = (user) => {
@@ -12,7 +15,9 @@ const createAccessToken = (user) => {
 };
 
 const createRefreshToken = (user_name) => {
-  return jwt.sign({ username: user_name }, process.env.SECRET_KEY);
+  return jwt.sign({ username: user_name }, process.env.SECRET_KEY, {
+    expiresIn: "10m",
+  });
 };
 
 const verify_token = async (access_token) => {
@@ -45,7 +50,9 @@ const refresh_token = async (refreshToken) => {
     try {
       const token = await verify_token(refreshToken);
       // console.log(token)
-      const [users] = await db.local.promise().query("SELECT * FROM users WHERE user_name = ?", [token.username]);
+      const [users] = await db.local
+        .promise()
+        .query("SELECT * FROM users WHERE user_name = ?", [token.username]);
       if (users.length > 0) {
         const access_token = createAccessToken(users[0]);
         const user = await verify_token(access_token);
@@ -61,7 +68,6 @@ const refresh_token = async (refreshToken) => {
   } else {
     throw new ErrorResponse(401, "Gagal refresh token, Silahkan login kembali");
   }
-
 };
 
 const login = async (req) => {
@@ -81,7 +87,6 @@ const login = async (req) => {
         // jika password salah
         throw new ErrorResponse(401, "Password salah");
       } else {
-
         const access_token = createAccessToken(users[0]);
         const user = await verify_token(access_token);
         const expires_at = user.exp * 1000;
@@ -97,46 +102,58 @@ const login = async (req) => {
   }
 };
 
-
 const registrasi = async (req) => {
   const input = validate(addUserValidation, req); //validasi input
   let hashedPassword = bcrypt.hashSync(input.password, 8);
   try {
-    const [users] = await db.local.promise().query("SELECT * FROM users WHERE user_name = ?", [input.username])
+    const [users] = await db.local
+      .promise()
+      .query("SELECT * FROM users WHERE user_name = ?", [input.username]);
     if (users.length > 0) {
       throw new ErrorResponse(400, "User sudah ada");
     } else {
       // jika user belum ada maka insert user
-      let data = { user_name: input.username, password: hashedPassword, created_by: input.username };
-      const [addUser] = await db.local.promise().query("INSERT INTO users SET ?", [data]);
+      let data = {
+        user_name: input.username,
+        password: hashedPassword,
+        created_by: input.username,
+      };
+      const [addUser] = await db.local
+        .promise()
+        .query("INSERT INTO users SET ?", [data]);
       return addUser;
     }
-
   } catch (error) {
     throw new ErrorResponse(error.status, error);
   }
-}
+};
 
 const create = async (req, user) => {
   // console.log(user)
   const input = validate(addUserValidation, req); //validasi input
   let hashedPassword = bcrypt.hashSync(input.password, 8);
   try {
-    const [users] = await db.local.promise().query("SELECT * FROM users WHERE user_name = ?", [input.username])
+    const [users] = await db.local
+      .promise()
+      .query("SELECT * FROM users WHERE user_name = ?", [input.username]);
     if (users.length > 0) {
       throw new ErrorResponse(400, "User sudah ada");
     } else {
       // jika user belum ada maka insert user
-      let data = { user_name: input.username, password: hashedPassword, created_by: user.user_name };
-      const [addUser] = await db.local.promise().query("INSERT INTO users SET ?", [data]);
+      let data = {
+        user_name: input.username,
+        password: hashedPassword,
+        created_by: user.user_name,
+      };
+      const [addUser] = await db.local
+        .promise()
+        .query("INSERT INTO users SET ?", [data]);
       return addUser;
     }
-
   } catch (error) {
     throw new ErrorResponse(error.status, error);
   }
-}
-
+};
 
 const list = async () => {
   try {
@@ -154,34 +171,44 @@ const list = async () => {
 const remove = async (id) => {
   // console.log(user)
   try {
-    const [users] = await db.local.promise().query("SELECT * FROM users WHERE user_id = ?", [id])
+    const [users] = await db.local
+      .promise()
+      .query("SELECT * FROM users WHERE user_id = ?", [id]);
     if (users.length > 0) {
-      const [delUser] = await db.local.promise().query("DELETE FROM users WHERE user_id = ?", [id]);
+      const [delUser] = await db.local
+        .promise()
+        .query("DELETE FROM users WHERE user_id = ?", [id]);
       return delUser;
     } else {
       throw new ErrorResponse(400, "Data user tidak ditemukan");
     }
-
   } catch (error) {
     throw new ErrorResponse(error.status, error);
   }
-}
+};
 
 const update = async (input, id, user) => {
   // console.log(user)
   try {
-    const [users] = await db.local.promise().query("SELECT * FROM users WHERE user_id = ?", [id])
+    const [users] = await db.local
+      .promise()
+      .query("SELECT * FROM users WHERE user_id = ?", [id]);
     if (users.length > 0) {
-      const [updateUser] = await db.local.promise().query("UPDATE users SET user_name=? , created_by=? WHERE user_id=?", [input.username, user.user_name, id]);
+      const [updateUser] = await db.local
+        .promise()
+        .query("UPDATE users SET user_name=? , created_by=? WHERE user_id=?", [
+          input.username,
+          user.user_name,
+          id,
+        ]);
       return updateUser;
     } else {
       throw new ErrorResponse(400, "Data user tidak ditemukan");
     }
-
   } catch (error) {
     throw new ErrorResponse(error.status, error);
   }
-}
+};
 
 export default {
   verify_token,
