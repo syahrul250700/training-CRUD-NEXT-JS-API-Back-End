@@ -23,4 +23,5 @@ app.use("/produk", produk);
 // ini punya mustajib
 // SASASA
 //Ini punya Joko
+//ini punya uye
 export default app;
