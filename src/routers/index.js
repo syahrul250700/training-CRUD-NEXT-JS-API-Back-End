@@ -19,7 +19,7 @@ app.use("/product", product);
 app.use("/warehouse", warehouse);
 app.use("/produk", produk);
 // tes
-
+//pokayoke
 // SASASA
 
 export default app;
