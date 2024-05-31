@@ -16,4 +16,4 @@ product.post("/", (req, res) => {
   res.status(200).json({ status: req.body.id });
 });
 
-export default product;
+export default warehouse;
