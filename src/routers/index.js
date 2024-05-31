@@ -2,6 +2,7 @@ import express from "express";
 import users from "./users.js";
 import product from "./product.js";
 import warehouse from "./warehouse.js";
+import produk from "./produk.js";
 
 const app = express();
 
@@ -16,5 +17,6 @@ app.route("/").get((req, res) => {
 app.use("/users", users);
 app.use("/product", product);
 app.use("/warehouse", warehouse);
+app.use("/produk", produk);
 
 export default app;
