@@ -19,11 +19,8 @@ app.use("/product", product);
 app.use("/warehouse", warehouse);
 app.use("/produk", produk);
 // tes
-<<<<<<< HEAD
 //pokayoke
-=======
 // ini punya mustajib
->>>>>>> 7f06057 (tambah komen)
 // SASASA
 
 export default app;
