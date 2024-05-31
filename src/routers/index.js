@@ -18,5 +18,6 @@ app.use("/users", users);
 app.use("/product", product);
 app.use("/warehouse", warehouse);
 app.use("/produk", produk);
+// tes
 
 export default app;
