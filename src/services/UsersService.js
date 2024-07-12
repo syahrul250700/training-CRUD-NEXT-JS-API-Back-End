@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import * as db from "../app/db.js";
 import { ErrorResponse } from "../app/error.js";
@@ -14,8 +14,8 @@ const createAccessToken = (user) => {
   });
 };
 
-const createRefreshToken = (user_name) => {
-  return jwt.sign({ username: user_name }, process.env.SECRET_KEY, {
+const createRefreshToken = (username) => {
+  return jwt.sign({ username: username }, process.env.SECRET_KEY, {
     expiresIn: "24h", //24jam dari waktu refresh token
   });
 };
@@ -52,12 +52,12 @@ const refresh_token = async (refreshToken) => {
       // console.log(token)
       const [users] = await db.local
         .promise()
-        .query("SELECT * FROM users WHERE user_name = ?", [token.username]);
+        .query("SELECT * FROM users WHERE username = ?", [token.username]);
       if (users.length > 0) {
         const access_token = createAccessToken(users[0]);
         const user = await verify_token(access_token);
         const expires_at = user.exp * 1000;
-        const refresh_token = createRefreshToken(users[0].user_name);
+        const refresh_token = createRefreshToken(users[0].username);
         return { access_token, refresh_token, expires_at };
       } else {
         throw new ErrorResponse(400, "User tidak ditemukan");
@@ -75,7 +75,7 @@ const login = async (req) => {
   try {
     const [users] = await db.local
       .promise()
-      .query("SELECT * FROM users WHERE user_name = ?", [input.username]);
+      .query("SELECT * FROM users WHERE username = ?", [input.username]);
 
     if (users.length > 0) {
       //jika data user sudah ada cek password
@@ -90,7 +90,7 @@ const login = async (req) => {
         const access_token = createAccessToken(users[0]);
         const user = await verify_token(access_token);
         const expires_at = user.exp * 1000;
-        const refresh_token = createRefreshToken(users[0].user_name);
+        const refresh_token = createRefreshToken(users[0].username);
 
         return { access_token, refresh_token, expires_at };
       }
@@ -108,13 +108,13 @@ const registrasi = async (req) => {
   try {
     const [users] = await db.local
       .promise()
-      .query("SELECT * FROM users WHERE user_name = ?", [input.username]);
+      .query("SELECT * FROM users WHERE username = ?", [input.username]);
     if (users.length > 0) {
       throw new ErrorResponse(400, "User sudah ada");
     } else {
       // jika user belum ada maka insert user
       let data = {
-        user_name: input.username,
+        username: input.username,
         password: hashedPassword,
         created_by: input.username,
       };
@@ -135,15 +135,15 @@ const create = async (req, user) => {
   try {
     const [users] = await db.local
       .promise()
-      .query("SELECT * FROM users WHERE user_name = ?", [input.username]);
+      .query("SELECT * FROM users WHERE username = ?", [input.username]);
     if (users.length > 0) {
       throw new ErrorResponse(400, "User sudah ada");
     } else {
       // jika user belum ada maka insert user
       let data = {
-        user_name: input.username,
+        username: input.username,
         password: hashedPassword,
-        created_by: user.user_name,
+        // created_by: user.username,
       };
       const [addUser] = await db.local
         .promise()
@@ -196,9 +196,9 @@ const update = async (input, id, user) => {
     if (users.length > 0) {
       const [updateUser] = await db.local
         .promise()
-        .query("UPDATE users SET user_name=? , created_by=? WHERE user_id=?", [
+        .query("UPDATE users SET username=? , created_by=? WHERE user_id=?", [
           input.username,
-          user.user_name,
+          user.username,
           id,
         ]);
       return updateUser;

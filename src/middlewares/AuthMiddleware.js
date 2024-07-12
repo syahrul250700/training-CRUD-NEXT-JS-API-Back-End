@@ -15,12 +15,12 @@ export const authentication = async (req, res, next) => {
     } else {
       const { access_token, refresh_token, expires_at } =
         await UsersService.refresh_token(refreshToken);
-      res.cookie("access_token", access_token, { httpOnly: true });
+      res.cookie("access_token", access_token);
       res.cookie("refresh_token", refresh_token, {
         httpOnly: true,
         maxAge: 86400000, //24jam dari waktu refresh token
       });
-      res.cookie("expires_at", expires_at, { httpOnly: true });
+      res.cookie("expires_at", expires_at);
       const user_refresh = await UsersService.verify_token(access_token);
       req.user = user_refresh;
       next();

@@ -12,10 +12,10 @@ import { authentication } from "../middlewares/AuthMiddleware.js";
 
 const users = express.Router();
 
-users.get("/", authentication, getUsers);
-users.post("/", authentication, addUsers);
-users.delete("/:id", authentication, deleteUsers);
-users.put("/:id", authentication, updateUsers);
+users.get("/", getUsers);
+users.post("/", addUsers);
+users.delete("/:id", deleteUsers);
+users.put("/:id", updateUsers);
 users.post("/login", loginUsers);
 users.post("/logout", logoutUsers);
 users.post("/registrasi", registrasiUsers);

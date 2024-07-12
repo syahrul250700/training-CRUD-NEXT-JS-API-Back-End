@@ -1,8 +1,8 @@
 import express from "express";
 import users from "./users.js";
-import product from "./product.js";
-import warehouse from "./warehouse.js";
-import produk from "./produk.js";
+// import product from "./product.js";
+// import warehouse from "./warehouse.js";
+import products from "./products.js";
 
 const app = express();
 
@@ -15,9 +15,9 @@ app.route("/").get((req, res) => {
 });
 
 app.use("/users", users);
-app.use("/product", product);
-app.use("/warehouse", warehouse);
-app.use("/produk", produk);
+// app.use("/product", product);
+// app.use("/warehouse", warehouse);
+app.use("/products", products);
 // tes
 //pokayoke
 // ini punya mustajib

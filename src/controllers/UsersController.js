@@ -5,12 +5,12 @@ export const loginUsers = async (req, res, next) => {
   try {
     const { access_token, refresh_token, expires_at } =
       await UsersService.login(req.body);
-    res.cookie("access_token", access_token, { httpOnly: true });
+    res.cookie("access_token", access_token);
     res.cookie("refresh_token", refresh_token, {
       httpOnly: true,
       maxAge: 86400000, //24jam
     });
-    res.cookie("expires_at", expires_at, { httpOnly: true });
+    res.cookie("expires_at", expires_at);
     res.status(200).json({
       status: true,
       code: res.statusCode,
