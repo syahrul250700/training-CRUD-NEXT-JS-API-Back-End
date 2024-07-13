@@ -21,7 +21,7 @@ const listProductById = async (id) => {
     if (products.length == 0) {
       throw new ErrorResponse(404, "Data Prouk Tidak ada");
     } else {
-      return products;
+      return products[0];
     }
   } catch {
     throw new ErrorResponse(error.status, error);
